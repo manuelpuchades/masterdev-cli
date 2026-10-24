@@ -1,0 +1,40 @@
+{
+  "name": "masterdev-cli",
+  "version": "0.1.0",
+  "description": "JSON-first CLI for your Master.dev (formerly Frontend Masters) course progress, built for humans and coding agents",
+  "type": "module",
+  "bin": {
+    "masterdev": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "SKILL.md",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "node src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "master.dev",
+    "frontendmasters",
+    "cli",
+    "agents"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^8.7.4",
+    "@napi-rs/keyring": "^2.1.2",
+    "commander": "^15.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}

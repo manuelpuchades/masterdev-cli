@@ -1,0 +1,3 @@
+# A polite client: sequential, throttled requests and a local cache
+
+This is a personal tool using a private API, so it must never look like a crawler. Every request goes through one module that sends them one at a time, at least 300 ms apart, with a 20 s timeout and the User-Agent `masterdev-cli/<version>`. Reads are cached on disk: the Catalog and course details for 24 hours (they rarely change), Library and Course progress for 2 minutes, so a learner who just watched a Lesson sees it on the next call; `--fresh` skips the cache. The `user` block of session responses (name, email, Intercom digest) is dropped before anything is cached.
