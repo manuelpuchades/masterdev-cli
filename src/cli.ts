@@ -109,7 +109,12 @@ async function authLogin(opts: LoginOptions, global: GlobalOptions): Promise<voi
     started = (await new MasterDevApi({ cookie, fresh: true }).library("started")).length;
   } catch (err) {
     if (err instanceof CliError && err.code === "auth_required") {
-      throw new CliError("auth_required", "Master.dev did not accept that session (expired or signed out).", "Sign in again at https://master.dev and retry.");
+      const where = browser ? `in ${browser} (profile "${profile}")` : "you gave";
+      throw new CliError(
+        "auth_required",
+        `The Master.dev session ${where} is no longer valid: it expired or was signed out.`,
+        browser ? `Open https://master.dev in that browser, sign in again and retry.` : "Sign in again at https://master.dev and retry.",
+      );
     }
     throw err;
   }

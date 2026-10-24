@@ -17,7 +17,8 @@ interface LibraryPage {
   meta: { childMeta: { courses: { paging: { currentPage: number; totalPages: number } } } };
 }
 
-type RawProgress = CourseProgressResponse & { user?: object | null };
+// `user.status` is 1 for a signed-in learner; anonymous visitors get an empty `user` with status 0.
+type RawProgress = CourseProgressResponse & { user?: { status?: number } | null };
 
 export interface ApiOptions {
   fresh?: boolean;
@@ -69,8 +70,8 @@ export class MasterDevApi {
 
 async function fetchCourseProgress(slug: string, cookie: string): Promise<CourseProgressResponse> {
   const raw = await getJson<RawProgress>(`${API}/session/${encodeURIComponent(slug)}`, cookie);
-  // This endpoint answers 200 to anonymous visitors: no `user` means the session is not valid.
-  if (!raw.user) throw new CliError("auth_required", "The Master.dev session expired.", LOGIN_HINT);
+  // This endpoint answers 200 to anonymous visitors too, so the status is the only signal.
+  if (!raw.user?.status) throw new CliError("auth_required", "The Master.dev session expired.", LOGIN_HINT);
   const { user: _personalData, ...progress } = raw;
   return { ...progress, progress: progress.progress ?? {} };
 }

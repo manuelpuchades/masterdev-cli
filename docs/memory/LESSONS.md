@@ -26,11 +26,11 @@ Format:
 - **Root cause:** the list is drawn by a script from inline data, and that script refreshes it by requesting the same URL with `Accept: application/json`, which the server honours, pagination included (`_page`, `_limit`).
 - **Rule:** before scraping a master.dev page, read its page script for `jsonFetch` and try the same URL with `Accept: application/json`.
 
-### `session/<slug>` answers 200 to an invalid cookie
+### `session/<slug>` answers 200 to an invalid cookie, with a `user`
 
-- **Symptom:** a made-up or expired `fem_auth_mod` got `200 OK` from `session/<slug>`, with every `features` flag `false` and empty progress, which looks like "no progress yet".
-- **Root cause:** the endpoint also serves anonymous visitors; it doesn't reject unknown sessions.
-- **Rule:** treat a session response without `user` as `auth_required`. To check a session, use a library page: it answers `401 {"code":401,"message":"not authorized"}`.
+- **Symptom:** a made-up or dead `fem_auth_mod` got `200 OK` from `session/<slug>` with empty progress, which looks like "no progress yet". We first checked for a missing `user`, but signed-out responses do have one: `{"displayName":"","email":"","intercomDigest":"","status":0}`. A real Browser import was then rejected only by the library check, while `session/` seemed fine.
+- **Root cause:** the endpoint also serves anonymous visitors and returns an empty `user` instead of rejecting unknown sessions. We had only looked at the first bytes of the anonymous response and assumed the rest.
+- **Rule:** a session response is signed in only when `user.status` is non-zero (1 seen). To check a session, use a library page: it answers `401 {"code":401,"message":"not authorized"}`. Before encoding how an endpoint behaves when signed out, read the whole signed-out response.
 
 ### The latest watched Lesson isn't where the learner is
 

@@ -23,7 +23,8 @@ Master.dev keeps only each Lesson's latest `lastWatched`, so watch history can't
 ## Open questions
 
 - **Password login:** a wrong email and password get `200` with the form again (no captcha after one attempt). Still to check with a real account: that a plain `POST /login/` with an empty `nonce` signs in, and whether a captcha appears after several failures.
-- **Session lifetime:** how long `fem_auth_mod` lasts, with and without "remember me", and whether a Password login from the CLI ends the browser's session.
+- **One session per account?** A browser's session died after signing in on another browser (docs/master-dev-api.md). If confirmed, Password login with automatic renewal would keep signing the learner out of their browser, and back: it should then warn, or stop renewing by password. Browser import is unaffected: it reuses the browser's own session.
+- **Session lifetime:** a browser cookie lasted 14 days; check whether "remember me" or use extends it.
 - **Library page size:** whether `_limit` accepts values above 10 (only 10 was observed).
 - **Learning paths:** not investigated; probably server-rendered pages that could be read like the library.
 - **Safari and Windows Browser import:** Safari needs Full Disk Access; Chromium on Windows uses DPAPI and app-bound encryption.

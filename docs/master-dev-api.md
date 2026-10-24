@@ -5,6 +5,8 @@ What we know about the endpoints the CLI uses, validated with a real account on 
 ## Auth
 
 - Session cookie `fem_auth_mod` (36 characters, UUID-like), set on `master.dev`, not HttpOnly. The website sends it to the API with `credentials: "include"`; the CLI sends `Cookie: fem_auth_mod=<value>`.
+- The cookie set by a browser sign-in on 2026-10-24 expires 14 days later.
+- **Suspected: one session per account.** After signing in on a second browser, the first browser's cookie stopped working (library `401`, empty `user`). Not confirmed yet; if true, a Password login from the CLI would sign the learner out of their browser.
 - Sign-in page `https://master.dev/login/`: a plain HTML form, `POST /login/` with `username`, `password`, `remember` (checkbox), and hidden `nonce` (empty on a fresh page) and `redirect`. Also "Sign in with GitHub / Google" through Master.dev's own OAuth apps. Untested from the CLI; see docs/IMPROVEMENTS.md.
 
 ## Public endpoints (no cookie)
@@ -53,7 +55,7 @@ Live workshops; shape not documented yet.
 ```
 
 - Only Lessons the learner has played appear in `progress`.
-- **Without a valid cookie it still answers 200**, with every `features` flag `false`, `notes: null` and no `user`. Treat a missing `user` as signed out.
+- **Without a valid cookie it still answers 200**, with every `features` flag `false`, `notes: null` and an empty `user` with `status: 0`. Signed in, `user.status` is 1: treat 0 or a missing `user` as signed out.
 
 ### `GET https://master.dev/my-account/library/<category>/` with `Accept: application/json`: Library
 
@@ -81,6 +83,7 @@ Live workshops; shape not documented yet.
 - Pagination: `?_page=N&_limit=N`; links look like `/my-account/library/started/?_limit=10&_page=10`. A page past the end returns an empty `courses`.
 - The `started` list is ordered by most recent activity.
 - `lastLessonSlug` is not the Next lesson (LESSONS).
+- `percentComplete` (0–100) is the plain mean of the Course's `percentViewed` over all its Lessons, unweighted by duration, and 100 once the Course is completed. Checked on three started Courses: 18.6 vs a mean of 18.5, 8.4 vs 8.4, and 17.3 vs 17.2 (the gap is our rounding). It is not the share of Completed lessons (ADR 0009), so the two numbers differ.
 
 ## Server-rendered pages
 
