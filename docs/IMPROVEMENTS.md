@@ -4,9 +4,9 @@ Backlog of next features and open questions. Remove an entry when it is done (th
 
 ## Next features
 
-### Plan
+### `next` from the Plan
 
-`masterdev plan add|list|done`: Lessons or Courses the learner or their agent decided to watch, kept locally (ADR 0002). An item becomes done when its Course progress shows it completed, so the agent can "remember" what it recommended across conversations.
+`next` picks from the latest started Course. It could offer pending Plan items first, so what the learner chose to watch beats what they happened to open last.
 
 ### Snapshots, Streaks and stats
 

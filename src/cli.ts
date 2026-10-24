@@ -6,12 +6,13 @@ import { forgetLogin, saveLogin, storedCookie } from "./auth/credentials.ts";
 import { parsePastedCookie } from "./auth/pasted-cookie.ts";
 import { passwordLogin } from "./auth/password-login.ts";
 import { clearUserCache } from "./cache.ts";
-import { catalogReport, courseReport, nextReport, progressReport } from "./commands.ts";
+import { catalogReport, courseReport, nextReport, planReport, planTargetExists, progressReport } from "./commands.ts";
 import { readConfig, type AuthMethod } from "./config.ts";
 import { CliError, EXIT_CODES } from "./errors.ts";
 import type { LibraryCategory } from "./model.ts";
 import { VERSION } from "./paths.ts";
-import { renderCatalog, renderCourse, renderNext, renderProgress } from "./render.ts";
+import { addToPlan, markDone, parseTarget, planId, readPlan, requireIds, writePlan } from "./plan.ts";
+import { renderCatalog, renderCourse, renderNext, renderPlan, renderProgress } from "./render.ts";
 
 interface GlobalOptions {
   pretty?: boolean;
@@ -158,6 +159,9 @@ async function authStatus(check: boolean, global: GlobalOptions): Promise<void> 
   });
 }
 
+/** Plan ids from what the user typed: links, `course/lesson` or ids as `plan` lists them. */
+const planIds = (targets: string[]) => targets.map((t) => planId(parseTarget(t)));
+
 export async function main(argv: string[]): Promise<void> {
   const program = new Command()
     .name("masterdev")
@@ -235,6 +239,59 @@ export async function main(argv: string[]): Promise<void> {
     .option("--limit <n>", "maximum courses to list", positiveNumber, 20)
     .action(async (query: string[], opts: { limit: number }, cmd: Command) => {
       print(await catalogReport(api(cmd), query.join(" "), opts.limit), globals(cmd), renderCatalog);
+    });
+
+  const plan = program.command("plan").description("lessons and courses you decided to watch, kept on this machine; done when Master.dev shows them completed");
+  plan
+    .command("list", { isDefault: true })
+    .description("the plan, pending first, with each item's status on Master.dev")
+    .option("--pending", "only items not done yet")
+    .action(async (opts: { pending?: boolean }, cmd: Command) => {
+      const report = await planReport(api(cmd), readPlan());
+      if (opts.pending) report.items = report.items.filter((i) => !i.done);
+      print(report, globals(cmd), renderPlan);
+    });
+  plan
+    .command("add")
+    .description("plan a lesson or a whole course")
+    .argument("<target>", "a master.dev link, <course>/<lesson> or <course>")
+    .argument("[lesson]", "lesson slug, when <target> is a course slug")
+    .option("--note <text>", "why it's planned, e.g. what it's for")
+    .action(async (target: string, lesson: string | undefined, opts: { note?: string }, cmd: Command) => {
+      const parsed = parseTarget(target, lesson);
+      await planTargetExists(api(cmd), parsed);
+      const result = addToPlan(readPlan(), parsed, opts.note, new Date());
+      writePlan(result.items);
+      const [item] = (await planReport(api(cmd), [result.item])).items;
+      print({ added: result.added, item }, globals(cmd), (r) => `${r.added ? "Planned" : "Already planned"}: ${r.item?.lesson?.title ?? r.item?.course.title}`);
+    });
+  plan
+    .command("done")
+    .description("mark items done by hand (finished elsewhere, or no longer wanted)")
+    .argument("<items...>", "plan ids, links or <course>/<lesson>")
+    .action((targets: string[], _opts: object, cmd: Command) => {
+      const ids = planIds(targets);
+      writePlan(markDone(readPlan(), ids, new Date()));
+      print({ done: ids }, globals(cmd), () => `Marked done: ${ids.join(", ")}`);
+    });
+  plan
+    .command("remove")
+    .alias("rm")
+    .description("take items out of the plan")
+    .argument("[items...]", "plan ids, links or <course>/<lesson>")
+    .option("--done", "remove every done item")
+    .action(async (targets: string[], opts: { done?: boolean }, cmd: Command) => {
+      if (!targets.length && !opts.done) throw new CliError("usage", "Say which items to remove, or use --done.");
+      const items = readPlan();
+      const ids = planIds(targets);
+      requireIds(items, ids);
+      if (opts.done) {
+        const report = await planReport(api(cmd), items);
+        ids.push(...report.items.filter((i) => i.done).map((i) => i.id));
+      }
+      writePlan(items.filter((i) => !ids.includes(i.id)));
+      const removed = items.filter((i) => ids.includes(i.id)).map((i) => i.id);
+      print({ removed }, globals(cmd), () => (removed.length ? `Removed: ${removed.join(", ")}` : "Nothing to remove."));
     });
 
   const pretty = argv.includes("--pretty");

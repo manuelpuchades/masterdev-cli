@@ -61,7 +61,7 @@ _Avoid_: Session length, slot
 ## Local memory
 
 **Plan**:
-Lessons or Courses the learner (or their agent) decided to watch, kept on the learner's machine; an item is done when Master.dev shows it as completed.
+Lessons or Courses the learner (or their agent) decided to watch, kept on the learner's machine; an item is done when Master.dev shows it as completed, or when the learner marks it done because they skipped or dropped it.
 _Avoid_: Queue, watchlist, to-do
 
 **Snapshot**:

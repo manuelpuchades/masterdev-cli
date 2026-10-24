@@ -14,3 +14,4 @@ One file per significant decision: hard to reverse, surprising without context, 
 | [0008](0008-polite-client-with-a-local-cache.md)       | A polite client: sequential, throttled requests and a local cache                            |
 | [0009](0009-next-lesson-and-completed-lessons.md)      | Next lesson after the furthest Completed lesson; completed means marked or ≥ 95 % viewed     |
 | [0010](0010-percent-complete-matches-master-dev.md)    | A Course's percent complete is Master.dev's figure, not a share of Completed lessons         |
+| [0011](0011-local-plan-completed-by-master-dev.md)     | The Plan is a local file whose items are done when Master.dev shows them completed           |

@@ -1,5 +1,6 @@
 import type { MasterDevApi } from "./api.ts";
 import { CliError } from "./errors.ts";
+import { planItemView, type PlanItem, type PlanItemView } from "./plan.ts";
 import {
   buildCourseView,
   courseUrl,
@@ -58,17 +59,19 @@ export async function progressReport(api: MasterDevApi, categories: LibraryCateg
 
 export type CourseReport = CourseView & { signedIn: boolean };
 
-export async function courseReport(api: MasterDevApi, slug: string, withLessons: boolean): Promise<CourseReport> {
+/** A Course with the learner's progress, or without it when they aren't signed in. */
+async function loadCourse(api: MasterDevApi, slug: string): Promise<{ view: CourseView; signedIn: boolean }> {
   const detail = await api.courseDetail(slug);
-  let signedIn = true;
-  let progress = null;
   try {
-    progress = await api.courseProgress(slug);
+    return { view: buildCourseView(detail, await api.courseProgress(slug)), signedIn: true };
   } catch (err) {
     if (!(err instanceof CliError) || err.code !== "auth_required") throw err;
-    signedIn = false;
+    return { view: buildCourseView(detail, null), signedIn: false };
   }
-  const view = buildCourseView(detail, progress);
+}
+
+export async function courseReport(api: MasterDevApi, slug: string, withLessons: boolean): Promise<CourseReport> {
+  const { view, signedIn } = await loadCourse(api, slug);
   if (!withLessons) view.sections = view.sections.map((s) => ({ ...s, lessons: [] }));
   return { signedIn, ...view };
 }
@@ -143,4 +146,35 @@ export async function catalogReport(api: MasterDevApi, query: string, limit: num
     return { ...entry, status: own?.status ?? null, percentComplete: own?.percentComplete ?? null };
   });
   return { query, total: matches.length, signedIn, courses };
+}
+
+export interface PlanReport {
+  signedIn: boolean;
+  pending: number;
+  done: number;
+  /** Pending items first, each group in the order they were added. */
+  items: PlanItemView[];
+}
+
+/** Each planned item with its status on Master.dev. A lesson planned in a course that no longer has it keeps `lesson: null`. */
+export async function planReport(api: MasterDevApi, items: PlanItem[]): Promise<PlanReport> {
+  const courses = new Map<string, CourseView>();
+  let signedIn = true;
+  for (const slug of new Set(items.map((i) => i.course))) {
+    const loaded = await loadCourse(api, slug);
+    courses.set(slug, loaded.view);
+    signedIn &&= loaded.signedIn;
+  }
+  const views = items.map((i) => planItemView(i, courses.get(i.course)!));
+  const pending = views.filter((v) => !v.done);
+  const done = views.filter((v) => v.done);
+  return { signedIn, pending: pending.length, done: done.length, items: [...pending, ...done] };
+}
+
+/** Checks that the course (and lesson) exist on Master.dev before planning them. */
+export async function planTargetExists(api: MasterDevApi, item: { course: string; lesson: string | null }): Promise<void> {
+  const view = buildCourseView(await api.courseDetail(item.course), null);
+  if (item.lesson && !view.sections.some((s) => s.lessons.some((l) => l.slug === item.lesson))) {
+    throw new CliError("not_found", `Course "${item.course}" has no lesson "${item.lesson}".`, `See its lessons with \`masterdev course ${item.course}\`.`);
+  }
 }

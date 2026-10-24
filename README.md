@@ -26,6 +26,10 @@ masterdev progress                   # started, completed and bookmarked courses
 masterdev course <slug>              # lesson by lesson: done, in progress, pending, time left
 masterdev next [--minutes 45]        # what to watch now, with links, fitted to your time
 masterdev catalog [query]            # search every course (newest first), marking the ones you've done
+
+masterdev plan add <link>            # plan a lesson or course, e.g. one your agent recommended
+masterdev plan                       # the plan, pending first; items are done once you watch them
+masterdev plan done|remove <item>    # mark done by hand, or take out (`remove --done` clears done ones)
 ```
 
 Every command prints JSON to stdout; add `--pretty` for a human view and `--fresh` to skip the cache. Errors are JSON on stderr with stable exit codes, so agents can react to them ([ADR 0001](docs/adr/0001-json-first-output-for-agents.md)):
@@ -50,7 +54,7 @@ Master.dev has no public API or tokens, so the CLI uses the same session cookie 
 
 ## For agents
 
-[`SKILL.md`](SKILL.md) teaches agents the flow: recommend a lesson with its link, and next time check your progress to see that you've watched it. Nothing needs to be written to your account for that: the Master.dev player records what you watch.
+[`SKILL.md`](SKILL.md) teaches agents the flow: recommend a lesson with its link, keep it in your local Plan, and next time see that you've watched it. Nothing is written to your account for that: the Master.dev player records what you watch, and the Plan lives on your machine ([ADR 0011](docs/adr/0011-local-plan-completed-by-master-dev.md)).
 
 Install it for Claude Code:
 

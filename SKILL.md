@@ -11,7 +11,8 @@ description: Master.dev (formerly Frontend Masters) courses through the `masterd
 
 1. **Ground every answer in fresh data.** Run the command that answers the question (below) before recommending anything. When the user says they just watched something, or the conversation picks up after a break, add `--fresh`.
 2. **Recommend with links.** Every lesson or course you suggest carries its `url` from the output, its duration, and, for a lesson in progress, its `resumeAt`.
-3. **Close the loop next time.** When the user comes back, run `masterdev next --fresh` (or `course <slug> --fresh`) and read each lesson's `status` to see whether what you recommended is now `completed` before suggesting more.
+3. **Plan what the user accepts.** When they say they'll watch something, run `masterdev plan add <url> --note "<why>"` so the next conversation knows. Don't plan what they didn't agree to.
+4. **Close the loop next time.** When the user comes back, run `masterdev plan --fresh` first: items with `done: true` were watched (or dropped). Acknowledge them, then recommend from the pending ones or with `next`.
 
 Done when the user has a concrete next lesson or course, with its link, backed by output from this session.
 
@@ -25,6 +26,9 @@ Done when the user has a concrete next lesson or course, with its link, backed b
 | What have I started / finished / bookmarked? | `masterdev progress`                            |
 | How far am I in a course, what's left?       | `masterdev course <slug>`                       |
 | Find a course about X                        | `masterdev catalog <words>` (newest first)      |
+| What did I plan / did I watch it?            | `masterdev plan --fresh`                        |
+| Remember a lesson or course for later        | `masterdev plan add <url> --note "<why>"`       |
+| I skipped it / I'm not doing it any more     | `masterdev plan done <url>` or `plan remove`    |
 
 `masterdev <command> --help` lists every flag.
 
@@ -35,6 +39,7 @@ Done when the user has a concrete next lesson or course, with its link, backed b
 - `course` → `progress` (`percentComplete`, `completedLessons`, `remainingSeconds`), `sections[].lessons[]` and `next`. `signedIn: false` means progress is unknown, not zero.
 - `catalog` → `courses[]` with `status` (`started`, `completed` or `null`) and `percentComplete`, so you can recommend courses the user hasn't taken.
 - `percentComplete` is the same number the Master.dev website shows (the mean of each lesson's viewed share). For time left, use `remainingSeconds`; for lessons, `completedLessons` / `totalLessons`.
+- `plan` → `items[]`, pending first, each with `done`, `status` (from Master.dev, `null` when unknown), `note`, `course` and, for a lesson, `lesson` with its `url` and `remainingSeconds`.
 - Durations are in seconds.
 
 ## Errors

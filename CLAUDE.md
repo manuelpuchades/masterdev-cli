@@ -24,6 +24,7 @@ TypeScript on Node ≥ 22.13 (ADR 0005), ESM, run directly with Node's type stri
 | ------------------------ | ------------------------------------------------------------------------------------------------------- |
 | `src/index.ts`           | Bin entry (`masterdev`)                                                                                  |
 | `src/cli.ts`             | Commands (commander), output and error handling                                                         |
+| `src/plan.ts`            | The Plan: parsing targets, the local file, and each item's status from Course progress (ADR 0011)       |
 | `src/model.ts`           | Pure domain logic: wire shapes, Course progress, Next lesson, Time budget, Catalog search (ADR 0009)    |
 | `src/api.ts`             | Master.dev reads: Catalog, course detail, Course progress, Library (ADR 0003, 0004)                     |
 | `src/auth/`              | Login methods (browser import, password, pasted cookie) and automatic renewal (ADR 0006)               |
@@ -38,7 +39,7 @@ TypeScript on Node ≥ 22.13 (ADR 0005), ESM, run directly with Node's type stri
 | `docs/memory/LESSONS.md` | Mistakes already paid for, as rules                                                                     |
 | `docs/IMPROVEMENTS.md`   | Backlog: next features and open questions                                                               |
 
-Paths at runtime: config in `$XDG_CONFIG_HOME/masterdev` (`MASTERDEV_CONFIG_DIR`), cache in `$XDG_CACHE_HOME/masterdev` (`MASTERDEV_CACHE_DIR`). `MASTERDEV_COOKIE` overrides the stored cookie.
+Paths at runtime: config in `$XDG_CONFIG_HOME/masterdev` (`MASTERDEV_CONFIG_DIR`), cache in `$XDG_CACHE_HOME/masterdev` (`MASTERDEV_CACHE_DIR`), the Plan in `$XDG_DATA_HOME/masterdev` (`MASTERDEV_DATA_DIR`). `MASTERDEV_COOKIE` overrides the stored cookie.
 
 ## Commands
 

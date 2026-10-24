@@ -1,4 +1,5 @@
-import type { CatalogReport, CourseReport, LibraryItem, NextReport, ProgressReport } from "./commands.ts";
+import type { CatalogReport, CourseReport, LibraryItem, NextReport, PlanReport, ProgressReport } from "./commands.ts";
+import type { PlanItemView } from "./plan.ts";
 import type { LessonStatus, LessonView } from "./model.ts";
 
 // `--pretty` views for humans. Agents read the JSON.
@@ -69,4 +70,19 @@ export function renderCatalog(r: CatalogReport): string {
     return `  ${c.date ?? "          "}  ${c.title} — ${formatDuration(c.durationSeconds)} ${mark}\n              ${c.url}`;
   });
   return [header, ...rows].join("\n");
+}
+
+function planLine(i: PlanItemView): string {
+  const mark = i.done ? "✓" : i.status ? STATUS_MARK[i.status] : "?";
+  const what = i.lesson ? `${i.lesson.title} — ${i.course.title}` : i.kind === "lesson" ? `${i.id} (no longer in the course)` : i.course.title;
+  const left = i.done ? "" : i.lesson ? ` · ${formatDuration(i.lesson.remainingSeconds)} left` : i.course.remainingSeconds !== null ? ` · ${formatDuration(i.course.remainingSeconds)} left` : "";
+  const lines = [`  ${mark} ${what}${left}`, `      ${i.lesson?.url ?? i.course.url}`];
+  if (i.note) lines.push(`      ${i.note}`);
+  return lines.join("\n");
+}
+
+export function renderPlan(r: PlanReport): string {
+  if (r.items.length === 0) return "The plan is empty. Add something with `masterdev plan add <link>`.";
+  const header = `Plan: ${r.pending} pending, ${r.done} done${r.signedIn ? "" : " · not signed in, statuses unknown"}`;
+  return [header, ...r.items.map(planLine)].join("\n");
 }
