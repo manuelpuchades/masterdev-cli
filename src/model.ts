@@ -178,6 +178,16 @@ export function pickNext(lessons: LessonView[]): LessonView | null {
   return lessons.slice(furthest + 1).find((l) => l.status !== "completed") ?? lessons.find((l) => l.status !== "completed") ?? null;
 }
 
+/**
+ * Master.dev's own figure (ADR 0010): the mean of every Lesson's Percent viewed, with a Completed
+ * lesson counting as 100, whatever its length. It matches the website once rounded.
+ */
+function percentComplete(lessons: LessonView[]): number {
+  if (lessons.length === 0) return 0;
+  const total = lessons.reduce((acc, l) => acc + (l.status === "completed" ? 100 : l.percentViewed), 0);
+  return round1(total / lessons.length);
+}
+
 export function buildCourseView(detail: CourseDetail, learner: CourseProgressResponse | null): CourseView {
   const byIndex = new Map(Object.values(detail.lessonData).map((l) => [l.index, l]));
   const progress = learner?.progress ?? {};
@@ -209,11 +219,9 @@ export function buildCourseView(detail: CourseDetail, learner: CourseProgressRes
 
   let courseProgress: CourseProgressSummary | null = null;
   if (learner) {
-    const completed = lessons.filter((l) => l.status === "completed");
-    const watched = completed.reduce((acc, l) => acc + l.durationSeconds, 0);
     courseProgress = {
-      percentComplete: durationSeconds ? round1((watched / durationSeconds) * 100) : 0,
-      completedLessons: completed.length,
+      percentComplete: percentComplete(lessons),
+      completedLessons: lessons.filter((l) => l.status === "completed").length,
       totalLessons: lessons.length,
       remainingSeconds: lessons.reduce((acc, l) => acc + l.remainingSeconds, 0),
       completedDate: learner.completedDate ?? null,

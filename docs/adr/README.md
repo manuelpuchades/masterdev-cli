@@ -13,3 +13,4 @@ One file per significant decision: hard to reverse, surprising without context, 
 | [0007](0007-secrets-in-the-os-keychain.md)             | Secrets in the OS keychain, with a 0600 file fallback                                        |
 | [0008](0008-polite-client-with-a-local-cache.md)       | A polite client: sequential, throttled requests and a local cache                            |
 | [0009](0009-next-lesson-and-completed-lessons.md)      | Next lesson after the furthest Completed lesson; completed means marked or ≥ 95 % viewed     |
+| [0010](0010-percent-complete-matches-master-dev.md)    | A Course's percent complete is Master.dev's figure, not a share of Completed lessons         |

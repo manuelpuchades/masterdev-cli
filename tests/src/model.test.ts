@@ -108,12 +108,11 @@ describe("buildCourseView", () => {
     expect(view.progress?.remainingSeconds).toBe(0);
   });
 
-  it("computes progress by the duration of completed lessons", () => {
+  it("computes percent complete like Master.dev: the mean Percent viewed, completed lessons as 100", () => {
     const view = buildCourseView(detail, halfwayThroughEvals);
-    const lessons = view.sections.flatMap((s) => s.lessons);
-    const done = lessons.slice(0, 6).reduce((acc, l) => acc + l.durationSeconds, 0);
     expect(view.progress?.completedLessons).toBe(6);
-    expect(view.progress?.percentComplete).toBe(Math.round((done / view.durationSeconds) * 1000) / 10);
+    // (6 × 100 + 86.3 + 0.3) / 37 lessons; Master.dev's library showed 18.62 for this progress.
+    expect(view.progress?.percentComplete).toBe(18.6);
     expect(view.progress?.lastWatched).toBe(new Date(T0 + 100 * DAY + 20_000).toISOString());
   });
 });

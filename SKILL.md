@@ -34,6 +34,7 @@ Done when the user has a concrete next lesson or course, with its link, backed b
 - `next` → `picks[]`, each with `course`, the `lessons` to watch in order, and `totalSeconds`. With `--minutes`, the lessons fit the budget; a single lesson longer than the budget still comes back alone.
 - `course` → `progress` (`percentComplete`, `completedLessons`, `remainingSeconds`), `sections[].lessons[]` and `next`. `signedIn: false` means progress is unknown, not zero.
 - `catalog` → `courses[]` with `status` (`started`, `completed` or `null`) and `percentComplete`, so you can recommend courses the user hasn't taken.
+- `percentComplete` is the same number the Master.dev website shows (the mean of each lesson's viewed share). For time left, use `remainingSeconds`; for lessons, `completedLessons` / `totalLessons`.
 - Durations are in seconds.
 
 ## Errors

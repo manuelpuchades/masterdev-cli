@@ -83,7 +83,7 @@ Live workshops; shape not documented yet.
 - Pagination: `?_page=N&_limit=N`; links look like `/my-account/library/started/?_limit=10&_page=10`. A page past the end returns an empty `courses`.
 - The `started` list is ordered by most recent activity.
 - `lastLessonSlug` is not the Next lesson (LESSONS).
-- `percentComplete` (0–100) is the plain mean of the Course's `percentViewed` over all its Lessons, unweighted by duration, and 100 once the Course is completed. Checked on three started Courses: 18.6 vs a mean of 18.5, 8.4 vs 8.4, and 17.3 vs 17.2 (the gap is our rounding). It is not the share of Completed lessons (ADR 0009), so the two numbers differ.
+- `percentComplete` (0–100) is the mean over all the Course's Lessons of `percentViewed`, a `userCompleted` Lesson counting as 1, unweighted by duration. Checked on five Courses: 18.62 vs 18.56, 8.375 vs 8.35, 17.27 vs 17.24, and 100 for both completed ones (whose raw `percentViewed` means are 48.8 and 67.8). The small gap suggests each Lesson is rounded up somehow; rounded to whole numbers, as the website shows it, they all match. ADR 0010.
 
 ## Server-rendered pages
 

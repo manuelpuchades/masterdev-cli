@@ -42,6 +42,10 @@ _Avoid_: Seen, done, watched
 How much of a **Lesson** the learner has actually watched, regardless of where the video was left.
 _Avoid_: Progress (ambiguous), percent complete
 
+**Percent complete**:
+How far the learner is through a **Course**, as Master.dev shows it: the mean **Percent viewed** of its **Lessons**, a **Completed lesson** counting as 100. It doesn't measure time left.
+_Avoid_: Progress (ambiguous)
+
 **Resume point**:
 Where the video of a **Lesson** was left the last time it was played; it can be before parts already watched.
 _Avoid_: Last position, bookmark

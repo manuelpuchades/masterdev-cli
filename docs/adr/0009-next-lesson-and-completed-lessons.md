@@ -4,5 +4,5 @@ Master.dev gives each Lesson a Resume point (`lastPercent`), a Percent viewed (`
 
 - A Lesson is completed when it is marked completed or its Percent viewed is at least 95 %.
 - The Next lesson is the first unfinished Lesson after the furthest Completed lesson, falling back to the first unfinished one; lessons skipped on purpose earlier don't keep coming back.
-- A Course's percent complete is the duration of its Completed lessons over its total duration.
+- ~~A Course's percent complete is the duration of its Completed lessons over its total duration.~~ Superseded by ADR 0010.
 - A Time budget takes consecutive unfinished Lessons from the Next lesson while their remaining time fits, and always at least one.
