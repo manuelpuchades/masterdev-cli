@@ -10,7 +10,7 @@
 ## Invariants — do not violate
 
 1. **English only** in code, comments, docs, ADRs and commit messages.
-2. **Read-only against Master.dev** (ADR 0002). Only `GET` requests. Never call `events/batch`, `video/*/source` or any endpoint that writes progress, notes, bookmarks or quiz answers. Local state (cache, config, the future Plan) is fine.
+2. **Read-only against Master.dev** (ADR 0002). Only `GET` requests, except posting the sign-in form for Password login (ADR 0006). Never call `events/batch`, `video/*/source` or any endpoint that writes progress, notes, bookmarks or quiz answers. Local state (cache, config, the future Plan) is fine.
 3. **Only `api.master.dev/v2/kabuki` and `master.dev` pages** (ADR 0003). Never the frozen `api.frontendmasters.com/v1`.
 4. **Secrets never leave the keychain except as the request cookie** (ADR 0007): never print, log, cache or write to a test fixture the `fem_auth_mod` cookie, the password, or the `user` block (`email`, `intercomDigest`) of a session response.
 5. **stdout is a contract** (ADR 0001): JSON by default, one document per command; errors go to stderr as JSON with a stable exit code. Renaming or removing an output field is a breaking change; adding one is not.

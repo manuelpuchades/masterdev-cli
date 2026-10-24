@@ -2,11 +2,20 @@
 
 A JSON-first CLI for your [Master.dev](https://master.dev) (formerly Frontend Masters) progress: which courses you've started, which lesson comes next, and what fits in the time you have. It's built for you and for coding agents such as Claude Code and Codex, which run it like any other command and recommend what to watch.
 
-> **Status: pre-alpha, not usable yet.** The design and the API research are done ([docs/](docs/)); the commands are being written. Nothing is published to npm yet.
+> **Status: alpha.** The commands work from source; sign-in still needs testing on more machines. Not published to npm yet.
 
 > **Unofficial.** Not affiliated with Master.dev. It reads *your own* data, with *your own* session, from the private API the website uses. It never writes to your account, never downloads videos, and keeps requests few and slow ([ADR 0002](docs/adr/0002-read-only-against-master-dev.md), [ADR 0008](docs/adr/0008-polite-client-with-a-local-cache.md)).
 
-## Planned commands
+## Install
+
+Requires Node ≥ 22.13.
+
+```bash
+git clone https://github.com/manuelpuchades/masterdev-cli.git
+cd masterdev-cli && npm install && npm run build && npm link
+```
+
+## Commands
 
 ```bash
 masterdev auth login                 # sign in (see below)
@@ -16,7 +25,7 @@ masterdev auth logout
 masterdev progress                   # started, completed and bookmarked courses
 masterdev course <slug>              # lesson by lesson: done, in progress, pending, time left
 masterdev next [--minutes 45]        # what to watch now, with links, fitted to your time
-masterdev catalog [query]            # search every course, marking the ones you've done
+masterdev catalog [query]            # search every course (newest first), marking the ones you've done
 ```
 
 Every command prints JSON to stdout; add `--pretty` for a human view and `--fresh` to skip the cache. Errors are JSON on stderr with stable exit codes, so agents can react to them ([ADR 0001](docs/adr/0001-json-first-output-for-agents.md)):
@@ -41,7 +50,15 @@ Master.dev has no public API or tokens, so the CLI uses the same session cookie 
 
 ## For agents
 
-The package will ship a `SKILL.md` that teaches agents the flow: recommend a lesson with its link, and next time check your progress to see that you've watched it. Nothing needs to be written to your account for that: the Master.dev player records what you watch.
+[`SKILL.md`](SKILL.md) teaches agents the flow: recommend a lesson with its link, and next time check your progress to see that you've watched it. Nothing needs to be written to your account for that: the Master.dev player records what you watch.
+
+Install it for Claude Code:
+
+```bash
+mkdir -p ~/.claude/skills/masterdev && cp SKILL.md ~/.claude/skills/masterdev/SKILL.md
+```
+
+For Codex or other agents, point their instructions file (`AGENTS.md`) at it.
 
 ## Development
 

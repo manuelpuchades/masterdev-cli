@@ -1,6 +1,6 @@
 # Read-only against Master.dev; any state of our own stays local
 
-The CLI only sends `GET` requests to Master.dev. It never calls `events/batch` (the player's telemetry), `video/*/source` (stream URLs) or any endpoint that writes progress, notes, bookmarks or quiz answers, although the session's `features` show the account may write them. Anything the CLI needs to remember (cache, config, the Plan, Snapshots) lives on the learner's machine.
+The CLI only sends `GET` requests to Master.dev, apart from posting the sign-in form for a Password login (ADR 0006), which changes nothing in the account. It never calls `events/batch` (the player's telemetry), `video/*/source` (stream URLs) or any endpoint that writes progress, notes, bookmarks or quiz answers, although the session's `features` show the account may write them. Anything the CLI needs to remember (cache, config, the Plan, Snapshots) lives on the learner's machine.
 
 Master.dev's Terms of Service grant a personal licence, forbid downloading content without a download link, and forbid reverse engineering the Service or interfering with its performance. They don't distinguish reading from writing, so this is our choice, not their rule: reading your own progress for yourself is the least intrusive use of a private API, while writing could corrupt the learner's own data and draws more attention.
 

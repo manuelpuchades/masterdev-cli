@@ -10,8 +10,6 @@
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "rootDir": "src",
     "types": ["node"]
   },
   "include": ["src", "tests"]

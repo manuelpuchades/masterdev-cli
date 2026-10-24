@@ -22,7 +22,7 @@ Master.dev keeps only each Lesson's latest `lastWatched`, so watch history can't
 
 ## Open questions
 
-- **Password login:** the form's hidden `nonce` is empty on a fresh page and the login script resets a `grecaptcha` when present. Check against a real account whether a plain `POST /login/` works and whether a captcha appears after failed attempts.
+- **Password login:** a wrong email and password get `200` with the form again (no captcha after one attempt). Still to check with a real account: that a plain `POST /login/` with an empty `nonce` signs in, and whether a captcha appears after several failures.
 - **Session lifetime:** how long `fem_auth_mod` lasts, with and without "remember me", and whether a Password login from the CLI ends the browser's session.
 - **Library page size:** whether `_limit` accepts values above 10 (only 10 was observed).
 - **Learning paths:** not investigated; probably server-rendered pages that could be read like the library.
